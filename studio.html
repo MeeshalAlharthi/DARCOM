@@ -1,13 +1,19 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap');
-:root{--navy:#071b34;--navy2:#0d2a4b;--gold:#cfa861;--bg:#eef2f6;--line:#dfe5ec;--ink:#10223b}
-*{box-sizing:border-box}body{margin:0;font-family:Tajawal;background:var(--bg);color:var(--ink);overflow:hidden}button,textarea{font-family:inherit}
-header{height:68px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(255,255,255,.1)}
-.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}.brand img{width:46px;height:46px;border-radius:10px;object-fit:cover}header button{background:var(--gold);border:0;border-radius:11px;padding:10px 16px;font-weight:800}
-.studio{height:calc(100vh - 68px);display:grid;grid-template-columns:1fr 340px;direction:ltr}.canvas,.chat{direction:rtl}.canvas{position:relative;background:#e9eef4}.canvas-toolbar{height:58px;background:#fff;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center;padding:0 16px}.canvas-toolbar button,.bottom-tools button,.quick button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 13px;font-weight:700}.canvas-toolbar button.active{background:var(--navy);color:#fff}
-.workarea{height:calc(100% - 116px);padding:24px;display:grid;place-items:center;overflow:auto}.empty-state{width:min(940px,95%);background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;text-align:center;box-shadow:0 20px 55px rgba(7,27,52,.10)}.empty-state img{width:100%;max-height:460px;object-fit:cover;border-radius:16px}.empty-state p{color:#718094}.cards{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.cards span{padding:8px 12px;background:#f0f4f8;border-radius:999px}
-.bottom-tools{height:58px;background:#fff;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;padding:0 16px;justify-content:center}
-.chat{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column}.chat-head{height:70px;padding:14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.chat-head small{display:block;color:#15956f}.chat-head button{border:0;background:#eef2f6;border-radius:10px;padding:8px 10px}
-.messages{flex:1;padding:16px;overflow:auto;background:#f8fafc}.msg{max-width:88%;padding:12px 14px;border-radius:16px;margin-bottom:10px;line-height:1.6}.msg.ai{background:#fff;border:1px solid var(--line);margin-left:auto}.msg.user{background:var(--navy);color:#fff;margin-right:auto}.quick{padding:10px;display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--line)}.quick button{font-size:12px}.composer{padding:12px;border-top:1px solid var(--line)}.composer textarea{width:100%;height:80px;resize:none;border:1px solid var(--line);border-radius:13px;padding:10px}.composer button{width:100%;margin-top:7px;border:0;background:var(--gold);color:var(--navy);font-weight:800;border-radius:11px;padding:11px}
-.toast{position:fixed;bottom:20px;left:20px;background:var(--navy);color:#fff;padding:12px 16px;border-radius:12px;display:none}.toast.show{display:block}
-@media(max-width:850px){body{overflow:auto}.studio{height:auto;grid-template-columns:1fr}.chat{min-height:650px;border-right:0}.canvas{min-height:760px}.project-name{display:none}}
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>استوديو DARCOM</title><link rel="stylesheet" href="studio.css"></head>
+<body>
+<header><a class="brand" href="index.html"><img src="darcom-logo.png"><b>DARCOM</b></a><div class="project-name">مشروع جديد — نسخة تجريبية</div><button id="saveProject">حفظ المشروع</button></header>
+<main class="studio">
+<section class="canvas">
+<div class="canvas-toolbar"><button data-view="plan" class="active">المخطط</button><button data-view="3d">3D</button><button data-view="exterior">الواجهة</button><button data-view="interior">الداخلية</button><button data-view="landscape">الحديقة</button></div>
+<div class="workarea" id="workarea">
+<div class="empty-state"><img src="studio-preview.png"><h2>مساحة عمل DARCOM</h2><p>اختر نوع العرض أو اطلب من المهندس الذكي إنشاء تصور.</p><div class="cards"><span>مخطط 2D</span><span>نموذج 3D</span><span>واجهة</span><span>تصميم داخلي</span></div></div>
+</div>
+<div class="bottom-tools"><button>↶ تراجع</button><button>↷ إعادة</button><button>＋ غرفة</button><button>▦ أثاث</button><button>◫ خامات</button><button>☀ إضاءة</button></div>
+</section>
+<aside class="chat">
+<div class="chat-head"><div><b>👷 المهندس الذكي</b><small>متصل — نسخة أولية</small></div><button id="clearChat">مسح</button></div>
+<div class="messages" id="messages"><div class="msg ai">السلام عليكم، أنا مهندس DARCOM. أخبرني: ما نوع المشروع ومساحة الأرض؟</div></div>
+<div class="quick"><button>فيلا 20×30</button><button>محطة وقود</button><button>معرض سيارات</button><button>ارفع مخطط</button></div>
+<div class="composer"><textarea id="message" placeholder="مثال: صمم فيلا دورين مع مجلس ومسبح..."></textarea><button id="send">إرسال</button></div>
+</aside>
+</main>
+<div class="toast" id="toast"></div><script src="studio.js"></script></body></html>

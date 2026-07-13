@@ -1,19 +1,13 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>استوديو DARCOM</title><link rel="stylesheet" href="studio.css"></head>
-<body>
-<header><a class="brand" href="index.html"><img src="assets/darcom-logo.png"><b>DARCOM</b></a><div class="project-name">مشروع جديد — نسخة تجريبية</div><button id="saveProject">حفظ المشروع</button></header>
-<main class="studio">
-<section class="canvas">
-<div class="canvas-toolbar"><button data-view="plan" class="active">المخطط</button><button data-view="3d">3D</button><button data-view="exterior">الواجهة</button><button data-view="interior">الداخلية</button><button data-view="landscape">الحديقة</button></div>
-<div class="workarea" id="workarea">
-<div class="empty-state"><img src="assets/studio-preview.png"><h2>مساحة عمل DARCOM</h2><p>اختر نوع العرض أو اطلب من المهندس الذكي إنشاء تصور.</p><div class="cards"><span>مخطط 2D</span><span>نموذج 3D</span><span>واجهة</span><span>تصميم داخلي</span></div></div>
-</div>
-<div class="bottom-tools"><button>↶ تراجع</button><button>↷ إعادة</button><button>＋ غرفة</button><button>▦ أثاث</button><button>◫ خامات</button><button>☀ إضاءة</button></div>
-</section>
-<aside class="chat">
-<div class="chat-head"><div><b>👷 المهندس الذكي</b><small>متصل — نسخة أولية</small></div><button id="clearChat">مسح</button></div>
-<div class="messages" id="messages"><div class="msg ai">السلام عليكم، أنا مهندس DARCOM. أخبرني: ما نوع المشروع ومساحة الأرض؟</div></div>
-<div class="quick"><button>فيلا 20×30</button><button>محطة وقود</button><button>معرض سيارات</button><button>ارفع مخطط</button></div>
-<div class="composer"><textarea id="message" placeholder="مثال: صمم فيلا دورين مع مجلس ومسبح..."></textarea><button id="send">إرسال</button></div>
-</aside>
-</main>
-<div class="toast" id="toast"></div><script src="studio.js"></script></body></html>
+
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const msgs=$('#messages'), input=$('#message'), toast=$('#toast');
+const notify=m=>{toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2000)};
+function add(text,type){const d=document.createElement('div');d.className='msg '+type;d.textContent=text;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight}
+function reply(text){setTimeout(()=>{let r='ممتاز. سأحوّل طلبك إلى موجز مشروع، ثم أقترح المخطط والواجهة والتصميم الداخلي.';if(text.includes('محطة'))r='سأجمع بيانات مساحة الأرض، عدد المضخات، المداخل والمخارج، المتجر، المغسلة والشواحن الكهربائية.';if(text.includes('معرض'))r='سأقترح صالة العرض، منطقة التسليم، VIP، المكاتب والورشة مع مسار حركة واضح.';if(text.includes('فيلا'))r='سأبدأ بتوزيع المجالس والصالات والخدمات ثم أجهز 3 خيارات للمخطط.';add(r,'ai');},450)}
+$('#send').onclick=()=>{const t=input.value.trim();if(!t)return;add(t,'user');input.value='';reply(t)};
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('#send').click()}});
+$$('.quick button').forEach(b=>b.onclick=()=>{input.value=b.textContent;$('#send').click()});
+$$('.canvas-toolbar button').forEach(b=>b.onclick=()=>{$$('.canvas-toolbar button').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#workarea h2').textContent='عرض '+b.textContent;notify('تم تغيير مساحة العرض')});
+$('#saveProject').onclick=()=>{localStorage.setItem('darcom-studio-project',JSON.stringify({savedAt:new Date().toISOString(),messages:msgs.innerText}));notify('تم حفظ المشروع محلياً')};
+$('#clearChat').onclick=()=>{msgs.innerHTML='<div class="msg ai">بدأنا محادثة جديدة. ما نوع المشروع؟</div>'};
+const brief=JSON.parse(localStorage.getItem('darcom-brief')||'null');if(brief)add(`وجدت موجزاً محفوظاً: ${brief.type} على أرض ${brief.length}×${brief.width}م بمساحة ${brief.area}م².`,'ai');
