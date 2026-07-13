@@ -75,11 +75,11 @@
 <footer><div class="container foot"><div class="brand"><img src="darcom-logo.png"><span>DARCOM<small>داركم</small></span></div><div>© 2026 DARCOM — نسخة MVP تجريبية</div></div></footer>
 
 <div class="modal" id="authModal"><div class="modal-box"><div class="modal-head"><h2 id="authTitle">إنشاء حساب</h2><button class="close">×</button></div>
-<div class="field"><label>الاسم</label><input id="name" placeholder="اسمك"></div><div class="field" style="margin-top:12px"><label>البريد الإلكتروني</label><input id="email" type="email" placeholder="name@example.com"></div>
-<button class="btn btn-primary full" id="authSubmit">متابعة</button><p class="notice">هذه نسخة تجريبية؛ يتم حفظ الحساب محلياً في المتصفح فقط.</p></div></div>
+<div class="field"><label>الاسم</label><input id="name" placeholder="اسمك"></div><div class="field" style="margin-top:12px"><label>البريد الإلكتروني</label><input id="email" type="email" placeholder="name@example.com"></div><div class="field" style="margin-top:12px"><label>كلمة المرور</label><input id="password" type="password" placeholder="6 أحرف على الأقل"></div><button class="btn btn-primary full" id="authSubmit">متابعة</button><p class="notice">سيتم إنشاء الحساب عبر Supabase.</p></div></div>
 
 <div class="modal" id="payModal"><div class="modal-box"><div class="modal-head"><h2>ابدأ تصميم مشروعك</h2><button class="close">×</button></div>
 <p>تصفح المعرض مجاني. لفتح استوديو التصميم يجب تسجيل البريد ثم اختيار باقة.</p>
 <button class="btn btn-primary full" id="goSubscribe">تسجيل وفتح الباقات</button><a class="btn btn-light full" href="/studio.html">معاينة الاستوديو التجريبي</a>
 <div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js"></script></body></html>
