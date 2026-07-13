@@ -8,7 +8,9 @@ const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_Xo4YBHiPtjZpJz-s1yxPrw_Pmi1Rp-b";
 
 let supabaseClient = null;
+let isSending = false;
 
+/* تحميل مكتبة Supabase */
 function loadSupabaseLibrary() {
   return new Promise((resolve, reject) => {
     if (window.supabase) {
@@ -17,10 +19,12 @@ function loadSupabaseLibrary() {
     }
 
     const script = document.createElement("script");
+
     script.src =
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
 
     script.onload = resolve;
+
     script.onerror = () => {
       reject(new Error("تعذر تحميل مكتبة Supabase"));
     };
@@ -29,6 +33,7 @@ function loadSupabaseLibrary() {
   });
 }
 
+/* حماية الاستوديو */
 async function protectStudio() {
   try {
     await loadSupabaseLibrary();
@@ -53,22 +58,34 @@ async function protectStudio() {
     }
 
     addLogoutButton(session.user);
+
     return true;
   } catch (error) {
-    console.error("خطأ التحقق من تسجيل الدخول:", error);
+    console.error(
+      "خطأ التحقق من تسجيل الدخول:",
+      error
+    );
+
     window.location.replace("/index.html");
+
     return false;
   }
 }
 
+/* إضافة زر تسجيل الخروج */
 function addLogoutButton(user) {
   const header = document.querySelector("header");
 
-  if (!header || document.querySelector("#logoutButton")) {
+  if (
+    !header ||
+    document.querySelector("#logoutButton")
+  ) {
     return;
   }
 
-  const logoutButton = document.createElement("button");
+  const logoutButton =
+    document.createElement("button");
+
   logoutButton.id = "logoutButton";
   logoutButton.type = "button";
   logoutButton.textContent = "تسجيل الخروج";
@@ -88,20 +105,33 @@ function addLogoutButton(user) {
 
   logoutButton.onclick = async () => {
     logoutButton.disabled = true;
-    logoutButton.textContent = "جارٍ الخروج...";
+    logoutButton.textContent =
+      "جارٍ الخروج...";
 
-    const { error } = await supabaseClient.auth.signOut();
+    try {
+      const { error } =
+        await supabaseClient.auth.signOut();
 
-    if (error) {
+      if (error) {
+        throw error;
+      }
+
+      localStorage.removeItem("darcom-user");
+
+      window.location.replace(
+        "/index.html"
+      );
+    } catch (error) {
       console.error(error);
-      logoutButton.disabled = false;
-      logoutButton.textContent = "تسجيل الخروج";
-      notify("تعذر تسجيل الخروج، حاول مرة أخرى");
-      return;
-    }
 
-    localStorage.removeItem("darcom-user");
-    window.location.replace("/index.html");
+      logoutButton.disabled = false;
+      logoutButton.textContent =
+        "تسجيل الخروج";
+
+      notify(
+        "تعذر تسجيل الخروج، حاول مرة أخرى"
+      );
+    }
   };
 
   header.appendChild(logoutButton);
@@ -111,6 +141,7 @@ const msgs = $("#messages");
 const input = $("#message");
 const toast = $("#toast");
 
+/* رسالة تنبيه صغيرة */
 const notify = (message) => {
   if (!toast) return;
 
@@ -119,44 +150,132 @@ const notify = (message) => {
 
   setTimeout(() => {
     toast.classList.remove("show");
-  }, 2000);
+  }, 2200);
 };
 
+/* إضافة رسالة داخل المحادثة */
 function add(text, type) {
-  if (!msgs) return;
+  if (!msgs) return null;
 
-  const message = document.createElement("div");
+  const message =
+    document.createElement("div");
+
   message.className = `msg ${type}`;
   message.textContent = text;
 
   msgs.appendChild(message);
   msgs.scrollTop = msgs.scrollHeight;
+
+  return message;
 }
 
-function reply(text) {
-  setTimeout(() => {
-    let response =
-      "ممتاز. سأحوّل طلبك إلى موجز مشروع، ثم أقترح المخطط والواجهة والتصميم الداخلي.";
+/* الاتصال بالمهندس الذكي الحقيقي */
+async function reply(text) {
+  if (isSending) {
+    notify(
+      "انتظر حتى يكتمل الرد الحالي"
+    );
+    return;
+  }
 
-    if (text.includes("محطة")) {
-      response =
-        "سأجمع بيانات مساحة الأرض، عدد المضخات، المداخل والمخارج، المتجر، المغسلة والشواحن الكهربائية.";
+  isSending = true;
+
+  const sendButton = $("#send");
+
+  if (sendButton) {
+    sendButton.disabled = true;
+    sendButton.textContent =
+      "جارٍ التفكير...";
+  }
+
+  const thinkingMessage = add(
+    "⏳ المهندس الذكي يدرس طلبك...",
+    "ai"
+  );
+
+  try {
+    const response = await fetch(
+      "/api/chat",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          message: text,
+        }),
+      }
+    );
+
+    let data = {};
+
+    try {
+      data = await response.json();
+    } catch {
+      throw new Error(
+        "رد الخادم غير صالح"
+      );
     }
 
-    if (text.includes("معرض")) {
-      response =
-        "سأقترح صالة العرض، منطقة التسليم، VIP، المكاتب والورشة مع مسار حركة واضح.";
+    if (thinkingMessage) {
+      thinkingMessage.remove();
     }
 
-    if (text.includes("فيلا")) {
-      response =
-        "سأبدأ بتوزيع المجالس والصالات والخدمات، ثم أجهز 3 خيارات للمخطط.";
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "تعذر الحصول على رد من المهندس الذكي"
+      );
     }
 
-    add(response, "ai");
-  }, 450);
+    const answer =
+      typeof data.reply === "string"
+        ? data.reply.trim()
+        : "";
+
+    if (!answer) {
+      throw new Error(
+        "لم يصل رد من المهندس الذكي"
+      );
+    }
+
+    add(answer, "ai");
+  } catch (error) {
+    if (
+      thinkingMessage &&
+      thinkingMessage.isConnected
+    ) {
+      thinkingMessage.remove();
+    }
+
+    console.error(
+      "خطأ الاتصال بالمهندس الذكي:",
+      error
+    );
+
+    add(
+      `❌ ${
+        error.message ||
+        "تعذر الاتصال بالمهندس الذكي"
+      }`,
+      "ai"
+    );
+  } finally {
+    isSending = false;
+
+    if (sendButton) {
+      sendButton.disabled = false;
+      sendButton.textContent = "إرسال";
+    }
+
+    if (input) {
+      input.focus();
+    }
+  }
 }
 
+/* تشغيل الاستوديو */
 async function initializeStudio() {
   const allowed = await protectStudio();
 
@@ -165,84 +284,165 @@ async function initializeStudio() {
   const sendButton = $("#send");
 
   if (sendButton && input) {
-    sendButton.onclick = () => {
-      const text = input.value.trim();
+    sendButton.onclick = async () => {
+      const text =
+        input.value.trim();
 
-      if (!text) return;
+      if (!text) {
+        notify("اكتب طلبك أولًا");
+        return;
+      }
+
+      if (isSending) {
+        notify(
+          "انتظر حتى يكتمل الرد الحالي"
+        );
+        return;
+      }
 
       add(text, "user");
       input.value = "";
-      reply(text);
+
+      await reply(text);
     };
 
-    input.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        sendButton.click();
+    input.addEventListener(
+      "keydown",
+      (event) => {
+        if (
+          event.key === "Enter" &&
+          !event.shiftKey
+        ) {
+          event.preventDefault();
+          sendButton.click();
+        }
       }
-    });
+    );
   }
 
-  $$(".quick button").forEach((button) => {
-    button.onclick = () => {
-      if (!input || !sendButton) return;
+  /* الأزرار السريعة */
+  $$(".quick button").forEach(
+    (button) => {
+      button.onclick = () => {
+        if (
+          !input ||
+          !sendButton ||
+          isSending
+        ) {
+          return;
+        }
 
-      input.value = button.textContent;
-      sendButton.click();
-    };
-  });
+        input.value =
+          button.textContent.trim();
 
-  $$(".canvas-toolbar button").forEach((button) => {
-    button.onclick = () => {
-      $$(".canvas-toolbar button").forEach((item) => {
-        item.classList.remove("active");
-      });
+        sendButton.click();
+      };
+    }
+  );
 
-      button.classList.add("active");
+  /* أزرار المخطط والواجهة والداخلية */
+  $$(".canvas-toolbar button").forEach(
+    (button) => {
+      button.onclick = () => {
+        $$(".canvas-toolbar button").forEach(
+          (item) => {
+            item.classList.remove(
+              "active"
+            );
+          }
+        );
 
-      const title = $("#workarea h2");
+        button.classList.add("active");
 
-      if (title) {
-        title.textContent = `عرض ${button.textContent}`;
-      }
+        const title =
+          $("#workarea h2");
 
-      notify("تم تغيير مساحة العرض");
-    };
-  });
+        if (title) {
+          title.textContent =
+            `عرض ${button.textContent}`;
+        }
 
-  const saveProject = $("#saveProject");
+        notify(
+          "تم تغيير مساحة العرض"
+        );
+      };
+    }
+  );
+
+  /* حفظ المشروع */
+  const saveProject =
+    $("#saveProject");
 
   if (saveProject) {
     saveProject.onclick = () => {
       localStorage.setItem(
         "darcom-studio-project",
         JSON.stringify({
-          savedAt: new Date().toISOString(),
-          messages: msgs?.innerText || "",
+          savedAt:
+            new Date().toISOString(),
+          messages:
+            msgs?.innerText || "",
         })
       );
 
-      notify("تم حفظ المشروع محليًا");
+      notify(
+        "تم حفظ المشروع محليًا"
+      );
     };
   }
 
-  const clearChat = $("#clearChat");
+  /* مسح المحادثة */
+  const clearChat =
+    $("#clearChat");
 
   if (clearChat && msgs) {
     clearChat.onclick = () => {
-      msgs.innerHTML =
-        '<div class="msg ai">بدأنا محادثة جديدة. ما نوع المشروع؟</div>';
+      if (
+        isSending &&
+        !confirm(
+          "المهندس الذكي يكتب ردًا الآن. هل تريد مسح المحادثة؟"
+        )
+      ) {
+        return;
+      }
+
+      msgs.innerHTML = `
+        <div class="msg ai">
+          بدأنا محادثة جديدة.
+          أخبرني: ما نوع المشروع ومساحة الأرض ومتطلباتك؟
+        </div>
+      `;
+
+      notify("تم مسح المحادثة");
     };
   }
 
-  const brief = JSON.parse(
-    localStorage.getItem("darcom-brief") || "null"
-  );
+  /* قراءة موجز المشروع المحفوظ */
+  try {
+    const brief = JSON.parse(
+      localStorage.getItem(
+        "darcom-brief"
+      ) || "null"
+    );
 
-  if (brief) {
-    add(
-      `وجدت موجزًا محفوظًا: ${brief.type} على أرض ${brief.length}×${brief.width}م بمساحة ${brief.area}م².`,
-      "ai"
+    if (brief) {
+      add(
+        `وجدت موجزًا محفوظًا: ${
+          brief.type || "مشروع"
+        } على أرض ${
+          brief.length || 0
+        }×${
+          brief.width || 0
+        }م بمساحة ${
+          brief.area || 0
+        }م².`,
+        "ai"
+      );
+    }
+  } catch (error) {
+    console.error(
+      "تعذر قراءة موجز المشروع:",
+      error
     );
   }
 }
