@@ -80,29 +80,154 @@
   </div>
 </section>
 
-<section class="section" id="start">
+
+<section class="section smart-start-section" id="start">
   <div class="container">
-    <div class="cta">
-      <div><span class="eyebrow" data-i18n="fromScratch">ابدأ من الصفر</span><h2 data-i18n="landTitle">هات مقاسات أرضك… ونحن نتكفل بالباقي</h2><p data-i18n="landText">أدخل الأبعاد ونوع المشروع وسنجهز الموجز الأولي.</p></div>
-      <div class="quick-form">
-        <div class="grid2">
-          <div class="field"><label data-i18n="length">طول الأرض</label><input id="length" type="number" placeholder="30"></div>
-          <div class="field"><label data-i18n="width">عرض الأرض</label><input id="width" type="number" placeholder="20"></div>
-          <div class="field"><label data-i18n="projectType">نوع المشروع</label><select id="projectType">
-            <option value="villa" data-i18n="villa">فيلا سكنية</option>
-            <option value="station" data-i18n="fuelStation">محطة وقود</option>
-            <option value="showroom" data-i18n="carShowroom">معرض سيارات</option>
-            <option value="commercial" data-i18n="commercialProject">مشروع تجاري</option>
-          </select></div>
-          <div class="field"><label data-i18n="streets">عدد الشوارع</label><select id="streetsCount"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+    <div class="section-title">
+      <span class="pill" data-i18n="smartStartPill">ابدأ بالطريقة التي تناسبك</span>
+      <h2 data-i18n="smartStartTitle">كيف تريد أن تبدأ مشروعك؟</h2>
+      <p data-i18n="smartStartText">اختر المسار المناسب، ويمكنك تغيير التفاصيل لاحقًا دون أن يتوقف المشروع.</p>
+    </div>
+
+    <div class="start-modes">
+      <button class="start-mode active" type="button" data-mode="surprise">
+        <span class="mode-icon">✨</span>
+        <strong data-i18n="surpriseTitle">فاجئني بتصميم</strong>
+        <small data-i18n="surpriseText">أدخل نوع المشروع والمساحة فقط، واترك الباقي على DARCOM.</small>
+      </button>
+
+      <button class="start-mode" type="button" data-mode="custom">
+        <span class="mode-icon">🎯</span>
+        <strong data-i18n="customTitle">تصميم احترافي مخصص</strong>
+        <small data-i18n="customText">تحكم في التفاصيل واختيار الخدمات والمرافق.</small>
+      </button>
+
+      <button class="start-mode" type="button" data-mode="plan">
+        <span class="mode-icon">📐</span>
+        <strong data-i18n="planTitle">لدي مخطط</strong>
+        <small data-i18n="planText">ارفع صورة أو PDF للمخطط، وسنكمل عليه.</small>
+      </button>
+
+      <button class="start-mode" type="button" data-mode="existing">
+        <span class="mode-icon">🏗️</span>
+        <strong data-i18n="existingTitle">مشروع قائم</strong>
+        <small data-i18n="existingText">تطوير أو إعادة تصميم مشروع موجود.</small>
+      </button>
+    </div>
+
+    <div class="smart-start-panel">
+      <div class="grid2">
+        <div class="field">
+          <label data-i18n="country">الدولة</label>
+          <select id="country">
+            <option value="SA" data-i18n="saudiArabia">السعودية</option>
+            <option value="AE" data-i18n="uae">الإمارات</option>
+            <option value="QA" data-i18n="qatar">قطر</option>
+            <option value="KW" data-i18n="kuwait">الكويت</option>
+            <option value="BH" data-i18n="bahrain">البحرين</option>
+            <option value="OM" data-i18n="oman">عُمان</option>
+            <option value="OTHER" data-i18n="otherCountry">دولة أخرى</option>
+          </select>
         </div>
-        <div class="field field-gap"><label data-i18n="needs">الاحتياجات</label><textarea id="needs" data-i18n-placeholder="needsPlaceholder" placeholder="مثال: دورين، 5 غرف، مجلس، مسبح..."></textarea></div>
-        <button class="btn btn-primary full" id="previewBtn" data-i18n="showBrief">اعرض الموجز الأولي</button>
-        <div id="brief" class="notice"></div>
+
+        <div class="field">
+          <label data-i18n="cityOptional">المدينة (اختياري)</label>
+          <input id="city" data-i18n-placeholder="cityPlaceholder" placeholder="مثال: الرياض">
+        </div>
+
+        <div class="field">
+          <label data-i18n="projectType">نوع المشروع</label>
+          <select id="projectType">
+            <optgroup label="سكني">
+              <option value="villa" data-i18n="villa">فيلا سكنية</option>
+              <option value="palace" data-i18n="palace">قصر</option>
+              <option value="duplex" data-i18n="duplex">دوبلكس</option>
+              <option value="resthouse" data-i18n="resthouse">استراحة</option>
+              <option value="chalet" data-i18n="chalet">شاليه</option>
+            </optgroup>
+            <optgroup label="تجاري">
+              <option value="showroom" data-i18n="carShowroom">معرض سيارات</option>
+              <option value="mall" data-i18n="mall">مول تجاري</option>
+              <option value="restaurant" data-i18n="restaurant">مطعم</option>
+              <option value="cafe" data-i18n="cafe">مقهى</option>
+              <option value="hotel" data-i18n="hotel">فندق</option>
+            </optgroup>
+            <optgroup label="صناعي وخدمات">
+              <option value="factory" data-i18n="factory">مصنع</option>
+              <option value="warehouse" data-i18n="warehouse">مستودع</option>
+              <option value="station" data-i18n="fuelStation">محطة وقود</option>
+              <option value="workshop" data-i18n="workshop">ورشة</option>
+            </optgroup>
+            <optgroup label="عام وترفيهي">
+              <option value="mosque" data-i18n="mosque">مسجد</option>
+              <option value="school" data-i18n="school">مدرسة</option>
+              <option value="hospital" data-i18n="hospital">مستشفى</option>
+              <option value="weddingHall" data-i18n="weddingHall">قصر أفراح</option>
+              <option value="resort" data-i18n="resort">منتجع</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="field">
+          <label data-i18n="areaOnly">مساحة الأرض بالمتر المربع</label>
+          <input id="landArea" type="number" min="1" data-i18n-placeholder="areaPlaceholder" placeholder="مثال: 600">
+        </div>
+
+        <div class="field optional-dimensions">
+          <label data-i18n="lengthOptional">الطول (اختياري)</label>
+          <input id="length" type="number" min="1" placeholder="30">
+        </div>
+
+        <div class="field optional-dimensions">
+          <label data-i18n="widthOptional">العرض (اختياري)</label>
+          <input id="width" type="number" min="1" placeholder="20">
+        </div>
       </div>
+
+      <div class="custom-options" id="customOptions">
+        <h3 data-i18n="suggestedSaudiFeatures">مرافق مقترحة للمشاريع السعودية</h3>
+        <p class="notice" data-i18n="featuresHint">اختر ما تريده، أو اتركها لـ DARCOM ليقترح الأنسب حسب المساحة.</p>
+
+        <div class="feature-grid">
+          <label><input type="checkbox" value="external_annex"> <span data-i18n="externalAnnex">ملحق خارجي</span></label>
+          <label><input type="checkbox" value="majlis"> <span data-i18n="majlis">مجلس مستقل</span></label>
+          <label><input type="checkbox" value="garage"> <span data-i18n="garage">كراج سيارات</span></label>
+          <label><input type="checkbox" value="driver_room"> <span data-i18n="driverRoom">غرفة سائق</span></label>
+          <label><input type="checkbox" value="maid_room"> <span data-i18n="maidRoom">غرفة خادمة</span></label>
+          <label><input type="checkbox" value="guard_room"> <span data-i18n="guardRoom">غرفة حارس</span></label>
+          <label><input type="checkbox" value="indoor_garden"> <span data-i18n="indoorGarden">حديقة داخلية</span></label>
+          <label><input type="checkbox" value="outdoor_garden"> <span data-i18n="outdoorGarden">حديقة خارجية</span></label>
+          <label><input type="checkbox" value="indoor_pool"> <span data-i18n="indoorPool">مسبح داخلي</span></label>
+          <label><input type="checkbox" value="outdoor_pool"> <span data-i18n="outdoorPool">مسبح خارجي</span></label>
+          <label><input type="checkbox" value="bbq"> <span data-i18n="bbq">منطقة شواء</span></label>
+          <label><input type="checkbox" value="play_area"> <span data-i18n="playArea">منطقة ألعاب</span></label>
+        </div>
+
+        <div class="field field-gap">
+          <label data-i18n="extraNotes">ملاحظات إضافية (اختياري)</label>
+          <textarea id="needs" data-i18n-placeholder="extraNotesPlaceholder" placeholder="اكتب أي تعديل أو رغبة خاصة..."></textarea>
+        </div>
+      </div>
+
+      <div class="upload-panel" id="uploadPanel">
+        <div class="upload-drop">
+          <span>📎</span>
+          <strong data-i18n="uploadComing">رفع المخطط أو صورة المشروع</strong>
+          <small data-i18n="uploadComingText">هذه الخطوة جاهزة في الواجهة، وسيتم ربط الرفع والتحليل في المرحلة التالية.</small>
+        </div>
+      </div>
+
+      <div class="smart-actions">
+        <button class="btn btn-primary" id="generateIdeas" type="button" data-i18n="generateIdeas">✨ أنشئ لي 3 أفكار</button>
+        <button class="btn btn-light" id="suggestBest" type="button" data-i18n="suggestBest">اقترح الأفضل</button>
+        <button class="btn btn-light" id="skipDetails" type="button" data-i18n="skipDetails">تخطي التفاصيل</button>
+      </div>
+
+      <div id="brief" class="notice smart-brief"></div>
     </div>
   </div>
 </section>
+
 
 <section class="section" id="code"><div class="container"><div class="card code-card"><div><span class="pill" data-i18n="codeAwareness">وعي تنظيمي</span><h2 data-i18n="codeTitle">مراعاة متطلبات الكود السعودي</h2><p data-i18n="codeText">الفحوصات أولية، والاعتماد النهائي يحتاج مكتباً هندسياً مرخصاً.</p></div><div><p data-i18n="code1">✓ الارتدادات ونسب البناء</p><p data-i18n="code2">✓ الحركة والسلامة</p><p data-i18n="code3">✓ المواقف والخدمات</p></div></div></div></section>
 
