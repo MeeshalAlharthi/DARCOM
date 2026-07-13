@@ -1,7 +1,7 @@
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
 
-const SUPABASE_URL = "https://jvdhsxkvyotyfviiihj.supabase.co";
+const SUPABASE_URL = "https://jvdhsxkvyotyfviiihij.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_Xo4YBHiPtjZpJz-s1yxPrw_Pmi1Rp-b";
 
