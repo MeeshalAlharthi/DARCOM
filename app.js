@@ -1,41 +1,76 @@
-const $ = (selector) => document.querySelector(selector);
-const $$ = (selector) => document.querySelectorAll(selector);
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+const SUPABASE_URL = "https://jvdhsxkvyotyfviiihj.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_Xo4YBHiPtjZpJz-s1yxPrw_Pmi1Rp-b";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+let authMode = "signup";
 
 const toast = (message) => {
-  const element = $("#toast");
+  const t = $("#toast");
+  if (!t) return;
 
-  if (!element) return;
-
-  element.textContent = message;
-  element.classList.add("show");
+  t.textContent = message;
+  t.classList.add("show");
 
   setTimeout(() => {
-    element.classList.remove("show");
-  }, 2200);
+    t.classList.remove("show");
+  }, 2600);
 };
 
 const auth = $("#authModal");
 const pay = $("#payModal");
+const authTitle = $("#authTitle");
+const authNotice = $("#authNotice");
+const authSubmit = $("#authSubmit");
+const nameInput = $("#name");
+const emailInput = $("#email");
+const passwordInput = $("#password");
 
-/* فتح نافذة الدخول أو التسجيل */
+function openAuth(mode = "signup") {
+  authMode = mode;
+
+  if (!auth) return;
+
+  auth.classList.add("show");
+
+  if (authTitle) {
+    authTitle.textContent =
+      mode === "login" ? "تسجيل الدخول" : "إنشاء حساب";
+  }
+
+  if (authSubmit) {
+    authSubmit.textContent =
+      mode === "login" ? "دخول" : "إنشاء الحساب";
+  }
+
+  if (nameInput) {
+    nameInput.closest(".field").style.display =
+      mode === "login" ? "none" : "block";
+  }
+
+  if (authNotice) {
+    authNotice.textContent =
+      mode === "login"
+        ? "أدخل بريدك وكلمة المرور للدخول."
+        : "سيتم إنشاء حسابك عبر Supabase.";
+  }
+}
+
 $$("[data-open]").forEach((button) => {
   button.onclick = () => {
-    if (!auth) return;
-
-    auth.classList.add("show");
-
-    const title = $("#authTitle");
-
-    if (title) {
-      title.textContent =
-        button.dataset.open === "login"
-          ? "تسجيل الدخول"
-          : "إنشاء حساب مجاني";
-    }
+    openAuth(
+      button.dataset.open === "login" ? "login" : "signup"
+    );
   };
 });
 
-/* فتح نافذة الاشتراك */
 $$("[data-paywall]").forEach((button) => {
   button.onclick = () => {
     if (pay) {
@@ -44,7 +79,6 @@ $$("[data-paywall]").forEach((button) => {
   };
 });
 
-/* إغلاق النوافذ */
 $$(".close").forEach((button) => {
   button.onclick = () => {
     const modal = button.closest(".modal");
@@ -55,7 +89,6 @@ $$(".close").forEach((button) => {
   };
 });
 
-/* إغلاق النافذة عند الضغط خارجها */
 $$(".modal").forEach((modal) => {
   modal.onclick = (event) => {
     if (event.target === modal) {
@@ -64,44 +97,84 @@ $$(".modal").forEach((modal) => {
   };
 });
 
-/* تسجيل المستخدم ثم فتح الاستوديو */
-const authSubmit = $("#authSubmit");
-
 if (authSubmit) {
-  authSubmit.onclick = () => {
-    const emailInput = $("#email");
-    const nameInput = $("#name");
-
-    const email = emailInput ? emailInput.value.trim() : "";
-    const name = nameInput ? nameInput.value.trim() : "";
+  authSubmit.onclick = async () => {
+    const email = emailInput?.value.trim() || "";
+    const password = passwordInput?.value || "";
+    const name = nameInput?.value.trim() || "";
 
     if (!email) {
       toast("أدخل البريد الإلكتروني");
       return;
     }
 
-    localStorage.setItem(
-      "darcom-user",
-      JSON.stringify({
-        name,
-        email,
-        createdAt: new Date().toISOString(),
-      })
-    );
-
-    if (auth) {
-      auth.classList.remove("show");
+    if (password.length < 6) {
+      toast("كلمة المرور يجب ألا تقل عن 6 أحرف");
+      return;
     }
 
-    toast("تم التسجيل بنجاح، جارٍ فتح الاستوديو...");
+    authSubmit.disabled = true;
+    authSubmit.textContent = "جارٍ التنفيذ...";
 
-    setTimeout(() => {
-      window.location.href = "/studio.html";
-    }, 700);
+    try {
+      if (authMode === "login") {
+        const { error } =
+          await supabaseClient.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+        if (error) throw error;
+
+        toast("تم تسجيل الدخول بنجاح");
+
+        setTimeout(() => {
+          window.location.href = "/studio.html";
+        }, 700);
+      } else {
+        const { data, error } =
+          await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                full_name: name,
+              },
+            },
+          });
+
+        if (error) throw error;
+
+        if (data.session) {
+          toast("تم إنشاء الحساب بنجاح");
+
+          setTimeout(() => {
+            window.location.href = "/studio.html";
+          }, 700);
+        } else {
+          toast("تم إنشاء الحساب. تحقق من بريدك لتأكيده.");
+
+          if (authNotice) {
+            authNotice.textContent =
+              "أرسلنا رسالة تأكيد إلى بريدك الإلكتروني.";
+          }
+        }
+      }
+    } catch (error) {
+      const message =
+        error?.message === "Invalid login credentials"
+          ? "البريد أو كلمة المرور غير صحيحة"
+          : error?.message || "حدث خطأ، حاول مرة أخرى";
+
+      toast(message);
+    } finally {
+      authSubmit.disabled = false;
+      authSubmit.textContent =
+        authMode === "login" ? "دخول" : "إنشاء الحساب";
+    }
   };
 }
 
-/* زر تسجيل وفتح الباقات */
 const goSubscribe = $("#goSubscribe");
 
 if (goSubscribe) {
@@ -110,19 +183,10 @@ if (goSubscribe) {
       pay.classList.remove("show");
     }
 
-    if (auth) {
-      auth.classList.add("show");
-    }
-
-    const title = $("#authTitle");
-
-    if (title) {
-      title.textContent = "سجّل للانتقال إلى الاستوديو";
-    }
+    openAuth("signup");
   };
 }
 
-/* فلترة المشاريع */
 $$(".filter").forEach((filterButton) => {
   filterButton.onclick = () => {
     $$(".filter").forEach((item) => {
@@ -135,14 +199,14 @@ $$(".filter").forEach((filterButton) => {
 
     $$(".project").forEach((project) => {
       project.style.display =
-        selected === "الكل" || project.dataset.type === selected
+        selected === "الكل" ||
+        project.dataset.type === selected
           ? "block"
           : "none";
     });
   };
 });
 
-/* تصفية المشاريع من بطاقات الأقسام */
 $$(".category").forEach((category) => {
   category.onclick = () => {
     location.hash = "gallery";
@@ -151,14 +215,14 @@ $$(".category").forEach((category) => {
 
     $$(".project").forEach((project) => {
       project.style.display =
-        project.dataset.type === selected || selected === "الكل"
+        project.dataset.type === selected ||
+        selected === "الكل"
           ? "block"
           : "none";
     });
   };
 });
 
-/* المفضلة */
 let favs = JSON.parse(
   localStorage.getItem("darcom-favs") || "[]"
 );
@@ -209,62 +273,52 @@ $$(".project").forEach((project) => {
   }
 });
 
-/* عرض المفضلة */
-const showFav = $("#showFav");
+$("#showFav")?.addEventListener("click", () => {
+  $$(".project").forEach((project) => {
+    project.style.display = favs.includes(
+      project.dataset.id
+    )
+      ? "block"
+      : "none";
+  });
 
-if (showFav) {
-  showFav.onclick = () => {
-    $$(".project").forEach((project) => {
-      project.style.display = favs.includes(
-        project.dataset.id
-      )
-        ? "block"
-        : "none";
-    });
+  toast(
+    favs.length
+      ? "عرض المفضلة"
+      : "لا توجد مفضلة بعد"
+  );
+});
 
-    toast(
-      favs.length
-        ? "عرض المفضلة"
-        : "لا توجد مفضلة بعد"
-    );
+$("#previewBtn")?.addEventListener("click", () => {
+  const length = Number($("#length")?.value || 0);
+  const width = Number($("#width")?.value || 0);
+
+  if (!length || !width) {
+    toast("أدخل الطول والعرض");
+    return;
+  }
+
+  const brief = {
+    length,
+    width,
+    area: length * width,
+    type: $("#projectType")?.value || "",
+    needs: $("#needs")?.value || "",
   };
-}
 
-/* موجز الأرض */
-const previewButton = $("#previewBtn");
+  localStorage.setItem(
+    "darcom-brief",
+    JSON.stringify(brief)
+  );
 
-if (previewButton) {
-  previewButton.onclick = () => {
-    const length = Number($("#length")?.value || 0);
-    const width = Number($("#width")?.value || 0);
+  const briefElement = $("#brief");
 
-    if (!length || !width) {
-      toast("أدخل الطول والعرض");
-      return;
-    }
-
-    const brief = {
-      length,
-      width,
-      area: length * width,
-      type: $("#projectType")?.value || "",
-      needs: $("#needs")?.value || "",
-    };
-
-    localStorage.setItem(
-      "darcom-brief",
-      JSON.stringify(brief)
-    );
-
-    const briefElement = $("#brief");
-
-    if (briefElement) {
-      briefElement.innerHTML = `
-        مساحة الأرض
-        <b>${brief.area} م²</b>
-        — ${brief.type}.
-        تم حفظ الموجز، ولإكمال التصميم افتح الاستوديو.
-      `;
-    }
-  };
-}
+  if (briefElement) {
+    briefElement.innerHTML = `
+      مساحة الأرض
+      <b>${brief.area} م²</b>
+      — ${brief.type}.
+      تم حفظ الموجز، ولإكمال التصميم افتح الاستوديو.
+    `;
+  }
+});
