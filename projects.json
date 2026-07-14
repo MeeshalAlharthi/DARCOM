@@ -1,0 +1,34 @@
+{
+  "residential": [
+    "villa",
+    "palace",
+    "duplex",
+    "apartment",
+    "resthouse",
+    "chalet"
+  ],
+  "commercial": [
+    "mall",
+    "showroom",
+    "restaurant",
+    "cafe",
+    "hotel"
+  ],
+  "industrial": [
+    "factory",
+    "warehouse",
+    "workshop"
+  ],
+  "public": [
+    "mosque",
+    "school",
+    "hospital"
+  ],
+  "hospitality": [
+    "wedding_hall",
+    "resort"
+  ],
+  "services": [
+    "fuel_station"
+  ]
+}

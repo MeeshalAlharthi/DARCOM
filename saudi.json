@@ -1,0 +1,15 @@
+{
+  "country": "Saudi Arabia",
+  "default_features": [
+    "External Annex",
+    "Majlis",
+    "Garage",
+    "Driver Room",
+    "Maid Room",
+    "Outdoor Garden",
+    "Indoor Garden",
+    "Outdoor Pool",
+    "Indoor Pool"
+  ],
+  "note": "Concepts require review by a licensed engineering office."
+}
